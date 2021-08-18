@@ -1,4 +1,4 @@
-//Less comfortable version of Mario problem. This was done in CS50's IDE (ide.cs50.io).
+//Less comfortable version of Mario problem. This was done in CS50's IDE (ide.cs50.io) so that's where the cs50.h package comes in. Very challenging! Should've used functions.
 
 #include <stdio.h>
 #include <cs50.h>
