@@ -14,73 +14,117 @@ Your program must preserve case: capitalized letters must remain capitalized let
 After outputting ciphertext, you should print a newline. Your program should then exit by returning 0 from main.
 */
 
-/*
--takes command line argument: has to be a 26 alphabetical key with each character only once or it returns an error (error check function)
---stores this as a key
--takes plaintext input; stores as plaintext_input
-
--runs second array that's normal A-Z alphabet
-
--for now: capitalize plaintext to run through ascii codes
-
--iterating through plaintext
---if not alphabetical character: pass
---if alhapbetical:
----get ascii code
----compare to index of key array
----get key array character
----push to new converted ciphertext array
-
-return: ciphertext: [cipher array]
---exit 0 from main
-*/
-
 #include <ctype.h>
 #include <cs50.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 
-string key_check(string argument);
+bool length_check(string argument);
+bool alpha_check(string argument);
+bool repeat_check(string argument);
+void convert_text(string input, string argument);
 
 int main(int argc, string argv[]) {
-    //take command line argument
-    //confirm that argument is 26 characters, alphabetical only, and each character only appears once
-    //if good: continue
-    //if not: error
+
     if (argv[1]) {
         string argument = argv[1];
         string input = get_string("plaintext: ");
-        printf("Input: %s\n", input);
-        printf("Argument: %s\n", argument);
-        string key = key_check(argument);
-        printf("Key: %s\n", key);
+
+        bool length = length_check(argument);
+        if (length) {
+            return 1;
+        }
+
+        bool notalpha = alpha_check(argument);
+        if (notalpha) {
+            return 1;
+        }
+
+        bool repeat = repeat_check(argument);
+        if (repeat) {
+            return 1;
+        }
+
+        convert_text(input, argument);
+        return 0;
     } else {
-        printf("Need argument.\n");
+        printf("Usage: ./substitution key\n");
         return 0;
     }
 }
 
-/*
-key_check
--get key as argument
--check length: if array !== 26 length, pass false
--check characters: iterate, if a character is not alphabetical, pass false (or use strchr to check for non-alphabetical?)
--check for repeaty characters: if found, pass false (work on this one later)
 
-otherwise, pass true
-
-how can one programatically check if a character repeats?
--one thought: as a string is iterated, push each character to a check array
---then, iterate through check array with successive passes: if any of them match any characters found in the check array, throw a false
---making ASCII array to check for these characters against each other as well
-*/
-
-string key_check(string argument) {
+bool length_check(string argument) {
     //TODO: check for repeat characters
     if (strlen(argument) != 26) {
-        return "invalid";
-    } else {
-        return "valid";
+        printf("Argument must be exactly 26 characters.\n");
+        return true;
     }
+    return false;
+}
+
+bool alpha_check(string argument) {
+    for (int i = 0; i < strlen(argument); i++) {
+        if (isalpha(argument[i]) == 0) {
+            printf("Argument must only contain letters.\n");
+            return true;
+        }
+    }
+    return false;
+}
+
+bool repeat_check(string argument) {
+    for (int i = 0; i < strlen(argument); i++) {
+        char x = argument[i];
+
+        char *first = strchr(argument, x);
+        char *last = strrchr(argument, x);
+
+        if (first != last) {
+            printf("Characters cannot repeat.\n");
+            return true;
+        }
+    }
+    return false;
+}
+
+void convert_text(string input, string argument) {
+    printf("ciphertext: ");
+
+    for (int i = 0; i < strlen(input); i++) {
+        if (isalpha(input[i])) {
+
+        //if upper: subtract to get certain letter, if lower; subtract other number
+        //also: mark if letter is upper or lower
+        //subtract to get key index
+        //get key and compare
+        //bump to upper or lower based on what it was
+        //print
+
+            //using ASCII values to calc 0-25 index for ciphertext.
+            int capital_index;
+            bool is_upper;
+
+            if (isupper(input[i])) {
+                capital_index = input[i] - 65;
+                is_upper = true;
+            } else {
+                capital_index = input[i] - 97;
+                is_upper = false;
+            }
+
+            char y = argument[capital_index];
+
+            if (is_upper) {
+                printf("%c",toupper(y));
+            } else {
+                printf("%c",tolower(y));
+            }
+
+        } else {
+            printf("%c", input[i]);
+        }
+    }
+     printf("\n");
 }
