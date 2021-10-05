@@ -85,46 +85,53 @@ void reflect(int height, int width, RGBTRIPLE image[height][width])
 // Blur image
 void blur(int height, int width, RGBTRIPLE image[height][width])
 {
-    int total = 0;
-    //int h = height;
-    //int w = width;
-    //printf("H:%i ", h);
-    //printf("W:%i ", w);
 
 
-    //RBGTRIPLE temp[h][w];
+    //make a copy of the image to work with, otherwise you're writing onto the original when doing this in subsequent passes
+    RGBTRIPLE temp[height][width];
 
     for (int h = 0; h < height; h++) {
-        for (int w = 0; w < height; w++) {
+        for (int w = 0; w < width; w++) {
+
+            int red_total = 0;
+            int blue_total = 0;
+            int green_total = 0;
 
             for (int x = -1; x <= 1; x++) {
                 for (int y = -1; y <=1; y++) {
 
-                        //check to make sure new x and y doesn't fall outside of the grid of indices
-                        //currently only checks for that and not for corner stuff
-                        if (h+x >= 0 && w+y >= 0 ) {
-                        int blue = image[h+x][w+y].rgbtBlue;
-                        int red = image[h+x][w+y].rgbtRed;
-                        int green = image[h+x][w+y].rgbtGreen;
+                    //check to make sure new x and y doesn't fall outside of the grid of indices
+                    //currently only checks for that and not for corner stuff
+                    if (h+x >= 0 && w+y >= 0 ) {
 
-                        int average = (blue + red + green) / 3;
-                        total += average;
+                    blue_total += image[h+x][w+y].rgbtBlue;
+                    red_total += image[h+x][w+y].rgbtRed;
+                    green_total += image[h+x][w+y].rgbtGreen;
+                    }
 
-                        //printf("B:%i ", blue);
-                        //printf("G:%i ", green);
-                        //printf("R%i\n", red);
-                        }
+                    //int average = (blue + red + green) / 3;
+                    //total += average;
+                    //printf("B:%i ", blue);
+                    //printf("G:%i ", green);
+                    //printf("R%i\n", red);
 
+                    //int final_avg = (total / 9);
+                //printf("final: %i", final_avg);
+
+            temp[h][w].rgbtBlue = (blue_total / 9);
+            temp[h][w].rgbtRed = (red_total / 9);
+            temp[h][w].rgbtGreen = (green_total / 9);
                 }
             }
+        }
+    }
 
-        int final_avg = (total / 9);
-        //printf("final: %i", final_avg);
-
-        image[h][w].rgbtBlue = final_avg;
-        image[h][w].rgbtRed = final_avg;
-        image[h][w].rgbtGreen = final_avg;
-
+    //copy temp onto original image
+    for (int h = 0; h < height; h++) {
+        for (int w = 0; w < width; w++) {
+            image[h][w].rgbtRed = temp[h][w].rgbtRed;
+            image[h][w].rgbtBlue = temp[h][w].rgbtBlue;
+            image[h][w].rgbtGreen = temp[h][w].rgbtGreen;
         }
     }
 
@@ -135,47 +142,4 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
     //temp[h][w].rgbtRed = final_avg;
     //temp[h][w].rgbtGreen = final_avg;
 
-
-    //so for here I think I want to use image[h][w] as a starting point to get the values of the surrounding images in image[h][w] format
-    //for each neighboring pixel: get their RBG values,
-    /*
-    use compare and copy here
-
-    or iterate:
-    get current pixel value [h][w]
-    [h+1][w], [h-1][w]
-    [h+1][w+1], [h-1][w-1]
-    [h][w+1], [h-1][w-1]
-
-    if beyond height and width, don't use it
-
-    -we need a function in here, looks like, where we get the average of a blue/red/green color
-    average = (image[h][w].rgbtBlue + image[h][w].rgbtRed + image[h][w].rgbtGreen) / 3
-
-    so what we then need to do is get it programmatically for:
-    h-1, h, h+1
-    w-1 w w+1
-
-    IE, we then iterate with a little mini-grid
-
-    for image[h][w]:
-        set RGBTRIPLE temp
-        get value of original h and w
-
-    int total;
-
-    for (int x = h-1; x > h; x++) {
-        for (int y = w-1; y > w; y++) {
-            int average = (image[h][w].rgbtBlue + image[h][w].rgbtRed + image[h][w].rgbtGreen) / 3
-            total += average;
-        }
-    }
-
-    int final_avg = (total / 9);
-
-    image[h][w].rgbtBlue = final_avg;
-    image[h][w].rgbtRed = final_avg;
-    image[h][w].rgbtGreen = final_avg;
-
-    */
 }
