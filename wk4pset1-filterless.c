@@ -96,31 +96,25 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
             int red_total = 0;
             int blue_total = 0;
             int green_total = 0;
+            int counter = 0;
 
             for (int x = -1; x <= 1; x++) {
                 for (int y = -1; y <=1; y++) {
 
                     //check to make sure new x and y doesn't fall outside of the grid of indices
-                    //currently only checks for that and not for corner stuff
-                    if (h+x >= 0 && w+y >= 0 ) {
-
+                    if (h+x < 0 || h+x > height-1 || w+y < 0 || w+y > width-1) {
+                        continue;
+                    }
                     blue_total += image[h+x][w+y].rgbtBlue;
                     red_total += image[h+x][w+y].rgbtRed;
                     green_total += image[h+x][w+y].rgbtGreen;
-                    }
 
-                    //int average = (blue + red + green) / 3;
-                    //total += average;
-                    //printf("B:%i ", blue);
-                    //printf("G:%i ", green);
-                    //printf("R%i\n", red);
+                    counter++;
 
-                    //int final_avg = (total / 9);
-                //printf("final: %i", final_avg);
+                    temp[h][w].rgbtBlue = (blue_total / counter);
+                    temp[h][w].rgbtRed = (red_total / counter);
+                    temp[h][w].rgbtGreen = (green_total / counter);
 
-            temp[h][w].rgbtBlue = (blue_total / 9);
-            temp[h][w].rgbtRed = (red_total / 9);
-            temp[h][w].rgbtGreen = (green_total / 9);
                 }
             }
         }
@@ -134,12 +128,5 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
             image[h][w].rgbtGreen = temp[h][w].rgbtGreen;
         }
     }
-
-    //int final_avg = (total / 9);
-    //printf("final: %i", final_avg);
-
-    //temp[h][w].rgbtBlue = final_avg;
-    //temp[h][w].rgbtRed = final_avg;
-    //temp[h][w].rgbtGreen = final_avg;
 
 }
