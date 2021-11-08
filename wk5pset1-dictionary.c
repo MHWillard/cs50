@@ -1,3 +1,29 @@
+/*
+Implement a program that spell-checks a file, a la the below, using a hash table.
+
+$ ./speller texts/lalaland.txt
+MISSPELLED WORDS
+
+[...]
+AHHHHHHHHHHHHHHHHHHHHHHHHHHHT
+[...]
+Shangri
+[...]
+fianc
+[...]
+Sebastian's
+[...]
+
+WORDS MISSPELLED:
+WORDS IN DICTIONARY:
+WORDS IN TEXT:
+TIME IN load:
+TIME IN check:
+TIME IN size:
+TIME IN unload:
+TIME IN TOTAL:
+*/
+
 // Implements a dictionary's functionality
 
 #include <stdbool.h>
@@ -6,6 +32,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <strings.h>
 
 // Represents a node in a hash table
 typedef struct node
@@ -21,24 +48,34 @@ const unsigned int N = 26*26; //buckets for A-Z: 26*26 to get a big bucket size 
 // Hash table
 node *table[N];
 
-//variables for reading dictionary words
+//variables for reading and checking dictionary words
 int added_words = 0;
 char buffer[45];
+char lower[45];
 
 // Returns true if word is in dictionary, else false
 bool check(const char *word)
 {
     // TODO
-    int i = hash(word);
-    if (table[i] != NULL) {
-        //set head of the list to equal table[i]
-        node *current = table[i];
-        while (current != NULL) {
-            //compare and return true if good; otherwise, set head to the next node to continue iterating until NULL
-            if (strcmp(current->word, word)) return true;
-                current = current->next;
-            }
-        return false;
+    //use copy of word and lowercase it to compare against dict
+    strcpy(lower, word);
+    for (int x = 0; x<=strlen(lower); x++) {
+        if (lower[x] >= 65 && lower[x] <= 90) {
+            lower[x] = lower[x]+32;
+        }
+    }
+
+    int i = hash(lower);
+
+    //set head of the list to equal table[i]
+    node *current = table[i];
+    while (current != NULL) {
+        //compare and return true if good; otherwise, set head to the next node to continue iterating until NULL
+        if (strcasecmp(current->word, lower) == 0) {
+            return true;
+        }
+            //return true FIRST, then point to the next node
+            current = current->next;
     }
     return false;
 }
@@ -72,17 +109,22 @@ bool load(const char *dictionary)
         while (fscanf(infile, "%s", buffer) != EOF) {
             node *n = malloc(sizeof(node));
             strcpy(n->word, buffer);
-            //keep track of number of added words for size
-            added_words++;
             int i = hash(buffer);
 
             if (table[i] == NULL) {
                 n->next = NULL;
                 table[i] = n;
+                //keep track of number of added words for size
+                //read table[i]->word: print what's there, and only if something is there, add++ to words
+                //printf("word: %s\n", table[i]->word);
+                added_words++;
             } else {
                 //add temp value to catch first item of list: adds this node to the start of the list
                 n->next = table[i];
                 table[i] = n;
+                //keep track of number of added words for size
+                //printf("word: %s\n", table[i]->word);
+                added_words++;
             }
         }
         return true;
